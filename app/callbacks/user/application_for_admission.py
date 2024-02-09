@@ -11,28 +11,6 @@ from app.keyboards.inline import adms
 router = Router()
 
 
-@router.callback_query(F.data.in_(('yes', 'no')))
-async def process_callback(callback: types.CallbackQuery, bot: Bot):
-    if callback.data == 'yes':
-        await bot.send_message(chat_id=id_message, text="✅")
-        await bot.send_message(chat_id=id_message,
-                               text="Ваша запись на прием одобрена! Подробнее у @spectropfobia")
-        await bot.send_message(chat_id='-4086537550',
-                               text=odobreno_zapis.format(id=id_message,
-                                                          name=chel_message,
-                                                          user=user_message))
-    elif callback.data == 'no':
-        await bot.send_message(chat_id=id_message, text="❌")
-        await bot.send_message(chat_id=id_message,
-                               text="Ваша запись на прием отклонена! Подробнее у @spectropfobia")
-        await bot.send_message(chat_id='-4086537550',
-                               text=otkloneno_zapis.format(id=id_message,
-                                                           name=chel_message,
-                                                           user=user_message))
-    await callback.message.delete_reply_markup()
-    await callback.answer()
-
-
 @router.message(F.text == "📈 Записать на прием")
 async def reception(msg: Message, state: FSMContext):
     await state.update_data()
@@ -77,12 +55,5 @@ async def get_doc_info(msg: Message, bot: Bot, state: FSMContext):
                                                      user=msg.from_user.username,
                                                      fio=info_client['client_info'],
                                                      animal=info_client_animal['animal_info'],
-                                                     doktor=info_doc['doc_info']),
-                           reply_markup=adms)
-    global id_message
-    id_message = msg.chat.id
-    global chel_message
-    chel_message = msg.from_user.full_name
-    global user_message
-    user_message = msg.from_user.username
+                                                     doktor=info_doc['doc_info']))
     await state.clear()
